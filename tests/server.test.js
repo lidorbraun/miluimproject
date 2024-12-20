@@ -117,3 +117,36 @@ describe("Submit form with invalid data", () => {
     await expect(element(by.text("Invalid user_id provided"))).toBeVisible();
   });
 });
+
+// **בדיקות Cypress - מעקב סטטוס טפסים**
+
+describe("Form Status - Approved", () => {
+  it('should display at least one form with status "approved"', () => {
+    cy.visit("/form/status/1");
+
+    // מצפה שהמערכת תחזיר לפחות טופס אחד עם סטטוס "Approved"
+    cy.get(".form-item").should("have.length.greaterThan", 0); // לפחות טופס אחד מוצג
+    cy.get(".form-status").contains("Approved").should("be.visible");
+  });
+});
+
+describe("Form Status - No Approved Forms", () => {
+  it('should not display a form with status "approved" if no forms are approved', () => {
+    cy.visit("/form/status/2");
+
+    // מצפה שהמערכת לא תציג שום טופס עם סטטוס "Approved"
+    cy.get(".form-item").should("have.length.greaterThan", 0);
+    cy.get(".form-status").contains("Approved").should("not.exist"); // לא אמור להיות טופס עם סטטוס זה
+  });
+});
+
+describe("Form Status - No Forms", () => {
+  it("should display a message when no forms are found for the given user", () => {
+    cy.visit("/form/status/999"); // נניח שאין טפסים למשתמש עם ID = 999
+
+    // מצפה שהמערכת תציג הודעה מתאימה כאשר אין טפסים
+    cy.get(".no-forms-message")
+      .should("be.visible")
+      .contains("No forms found for this user");
+  });
+});
