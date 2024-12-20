@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-// קובץ חיבור למסד הנתונים
-=======
 const mysql = require("mysql2");
 
 // הגדרת החיבור למסד הנתונים
@@ -20,4 +17,3 @@ db.connect((err) => {
 });
 
 module.exports = db;
->>>>>>> master
