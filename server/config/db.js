@@ -4,8 +4,8 @@ const mysql = require("mysql2");
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: " ", // עדכן את הסיסמה אם יש צורך
-  database: "miluim", // שם מסד הנתונים
+  password: " ",
+  database: "miluim",
 });
 // *
 db.connect((err) => {

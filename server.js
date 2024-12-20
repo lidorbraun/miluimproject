@@ -72,6 +72,34 @@ app.get("/form/status/:user_id", (req, res) => {
   );
 });
 
+// נתיב להחזרת היסטוריית טפסים לפי משתמש
+app.get("/form/history/:user_id", (req, res) => {
+  const user_id = req.params.user_id;
+  const { date, status } = req.query;
+
+  let query =
+    "SELECT id, form_name, status, submission_date, description, file_path FROM forms WHERE user_id = ?";
+  let queryParams = [user_id];
+
+  if (date) {
+    query += " AND DATE(submission_date) = ?";
+    queryParams.push(date);
+  }
+
+  if (status) {
+    query += " AND status = ?";
+    queryParams.push(status);
+  }
+
+  db.query(query, queryParams, (err, results) => {
+    if (err) {
+      console.error("Error fetching form history:", err);
+      return res.status(500).send("Error fetching form history");
+    }
+    res.status(200).json(results);
+  });
+});
+
 // הפעלת השרת
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

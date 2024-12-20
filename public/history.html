@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="css/style.css" />
-    <title>מעקב סטטוס</title>
+    <title>היסטוריית טפסים</title>
   </head>
   <body>
     <nav>
@@ -16,35 +16,38 @@
     </nav>
 
     <div class="container">
-      <h1>מעקב סטטוס טפסים</h1>
-      <h2>הכנס מזהה משתמש כדי לבדוק את הסטטוס של הטפסים שלך</h2>
+      <h1>היסטוריית טפסים</h1>
+      <h2>חיפוש טפסים</h2>
+      <input type="number" id="user_id" placeholder="הכנס את מזהה המשתמש שלך" />
+      <input type="date" id="search_date" />
+      <select id="status_filter">
+        <option value="">בחר סטטוס</option>
+        <option value="pending">ממתין לאישור</option>
+        <option value="approved">אושר</option>
+        <option value="rejected">נדחה</option>
+      </select>
+      <button id="searchHistory">חפש</button>
 
-      <input
-        type="number"
-        id="user_id"
-        placeholder="הכנס את מזהה המשתמש שלך"
-        required
-      />
-      <button id="checkStatus">בדוק סטטוס</button>
-
-      <div id="statusResults"></div>
+      <div id="historyResults"></div>
     </div>
 
     <script>
       document
-        .getElementById("checkStatus")
+        .getElementById("searchHistory")
         .addEventListener("click", async () => {
           const user_id = document.getElementById("user_id").value;
+          const date = document.getElementById("search_date").value;
+          const status = document.getElementById("status_filter").value;
+          let url = `/form/history/${user_id}`;
 
-          if (!user_id) {
-            alert("אנא הכנס מזהה משתמש.");
-            return;
+          if (date || status) {
+            url += `?date=${date}&status=${status}`;
           }
 
-          const response = await fetch(`/form/status/${user_id}`);
+          const response = await fetch(url);
           const forms = await response.json();
 
-          const resultsDiv = document.getElementById("statusResults");
+          const resultsDiv = document.getElementById("historyResults");
           resultsDiv.innerHTML =
             forms.length === 0
               ? "<p>לא נמצאו טפסים</p>"
