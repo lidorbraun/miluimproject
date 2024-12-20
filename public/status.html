@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/style.css" />
+    <title>Status Tracker</title>
+  </head>
+  <body>
+    <nav>
+      <ul>
+        <li><a href="index.html">מילוי טופס</a></li>
+        <li><a href="status.html">מעקב סטטוס</a></li>
+      </ul>
+    </nav>
+
+    <div class="container">
+      <h1>Status Tracker</h1>
+      <h2>מעקב סטטוס טפסים</h2>
+      <input type="number" id="user_id" placeholder="Enter your User ID" />
+      <button id="checkStatus">Check Status</button>
+      <div id="statusResults"></div>
+    </div>
+
+    <script>
+      document
+        .getElementById("checkStatus")
+        .addEventListener("click", async () => {
+          const user_id = document.getElementById("user_id").value;
+          const response = await fetch(`/form/status/${user_id}`);
+          const forms = await response.json();
+
+          const resultsDiv = document.getElementById("statusResults");
+          resultsDiv.innerHTML = forms
+            .map(
+              (form) => `
+          <div>
+            <p><strong>Form Name:</strong> ${form.form_name}</p>
+            <p><strong>Status:</strong> ${form.status}</p>
+            <p><strong>Submission Date:</strong> ${form.submission_date}</p>
+            <p><strong>Description:</strong> ${form.description || "N/A"}</p>
+            <p><strong>File:</strong> ${
+              form.file_path
+                ? `<a href="${form.file_path}" target="_blank">Download</a>`
+                : "No File"
+            }</p>
+          </div>
+          <hr>
+        `
+            )
+            .join("");
+        });
+    </script>
+  </body>
+</html>

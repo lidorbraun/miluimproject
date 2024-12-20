@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 // לוגיקה עסקית של השרת
 =======
 const db = require("../config/db");
@@ -33,3 +34,5 @@ const getFormStatus = (req, res) => {
 
 module.exports = { submitForm, getFormStatus };
 >>>>>>> master
+=======
+>>>>>>> 4cd7ab616d070fe31d2b76f8dd8fa6d76a23d5b8

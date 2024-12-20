@@ -3,11 +3,12 @@
 =======
 const mysql = require("mysql2");
 
+// הגדרת החיבור למסד הנתונים
 const db = mysql.createConnection({
   host: "localhost",
-  user: "root", // שם המשתמש
-  password: "", // הסיסמה שלך
-  database: "miluim", // שם מסד הנתונים שלך
+  user: "root",
+  password: " ", // עדכן את הסיסמה אם יש צורך
+  database: "miluim", // שם מסד הנתונים
 });
 
 db.connect((err) => {
@@ -15,7 +16,7 @@ db.connect((err) => {
     console.error("Database connection failed:", err.message);
     process.exit(1);
   }
-  console.log("Connected to the database");
+  console.log("Connected to the database successfully!");
 });
 
 module.exports = db;
