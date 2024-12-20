@@ -10,7 +10,7 @@ const db = mysql.createConnection({
   password: " ", // עדכן את הסיסמה אם יש צורך
   database: "miluim", // שם מסד הנתונים
 });
-
+// *
 db.connect((err) => {
   if (err) {
     console.error("Database connection failed:", err.message);
