@@ -10,8 +10,8 @@ const PORT = 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// הגדרת קבצים סטטיים
-app.use(express.static(path.join(__dirname, "public")));
+// סטטי לשימוש בקבצי frontend
+app.use(express.static("public"));
 
 // יצירת תיקיית העלאות אם היא לא קיימת
 if (!fs.existsSync("uploads")) {
@@ -30,36 +30,44 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// נתיב לשמירת טופס עם העלאת קובץ
+// נתיב לשמירת טופס
 app.post("/form/submit", upload.single("file"), (req, res) => {
-  console.log("Request body:", req.body); // הדפסת גוף הבקשה
-  console.log("Uploaded file:", req.file); // הדפסת פרטי הקובץ שהועלה
-
   const { user_id, form_name, description } = req.body;
 
   if (!user_id || !form_name) {
-    console.error("Missing required fields: user_id and form_name");
     return res
       .status(400)
       .send("Missing required fields: user_id and form_name");
   }
 
+  const filePath = req.file ? req.file.path : null;
+
   db.query(
-    "INSERT INTO forms (user_id, form_name, description, file_path, status) VALUES (?, ?, ?, ?, ?)",
-    [
-      user_id,
-      form_name,
-      description,
-      req.file ? req.file.path : null,
-      "pending",
-    ],
+    "INSERT INTO forms (user_id, form_name, description, file_path, status, submission_date) VALUES (?, ?, ?, ?, 'pending', NOW())",
+    [user_id, form_name, description, filePath],
     (err, result) => {
       if (err) {
         console.error("Error inserting form data:", err);
         return res.status(500).send("Error submitting form");
       }
-      console.log("Form submitted successfully:", result);
       res.status(201).send("Form submitted successfully");
+    }
+  );
+});
+
+// נתיב להחזרת סטטוס טפסים לפי משתמש
+app.get("/form/status/:user_id", (req, res) => {
+  const user_id = req.params.user_id;
+
+  db.query(
+    "SELECT id, form_name, status, submission_date, description, file_path FROM forms WHERE user_id = ?",
+    [user_id],
+    (err, results) => {
+      if (err) {
+        console.error("Error fetching form data:", err);
+        return res.status(500).send("Error fetching form data");
+      }
+      res.status(200).json(results);
     }
   );
 });
