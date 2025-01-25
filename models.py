@@ -31,6 +31,7 @@ class Document(db.Model):
     title = db.Column(db.String(255), nullable=False)
     file_path = db.Column(db.Text, nullable=False)
     status = db.Column(db.String(50), default="Pending")  # Pending, Approved, Rejected
+    comments = db.Column(db.Text)  # Stores lecturer comments
     uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
     reviewed_at = db.Column(db.DateTime)
 

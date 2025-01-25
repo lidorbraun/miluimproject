@@ -9,9 +9,17 @@
         <h4 class="text-muted">תפקיד: {{ user.role }}</h4>
     </div>
 
+    {% if user.role == "Student" %}
+        <div class="d-flex justify-content-center mt-3">
+            <a href="{{ url_for('upload_document') }}" class="btn btn-success">
+                <i class="bi bi-upload"></i> העלה מסמך חדש
+            </a>
+        </div>
+    {% endif %}
+
     <div class="card mt-4 shadow-sm">
         <div class="card-header bg-primary text-white text-center">
-            <h5>מסמכים במערכת</h5>
+            <h5>המסמכים שלך</h5>
         </div>
         <div class="card-body">
             <table class="table table-hover text-center">
@@ -19,9 +27,10 @@
                     <tr>
                         <th>כותרת</th>
                         <th>סטטוס</th>
-                        <th>הועלה בתאריך</th>
-                        <th>עודכן לאחרונה</th>
                         <th>הורד מסמך</th>
+                        <th>הערות</th>
+                        {% if user.role == "Lecturer" %}<th>הוספת הערה</th>{% endif %}
+                        {% if user.role in ["Lecturer", "Reviewer"] %}<th>אישור מסמכים</th>{% endif %}
                     </tr>
                 </thead>
                 <tbody>
@@ -37,23 +46,47 @@
                                 <span class="badge bg-danger">נדחה</span>
                             {% endif %}
                         </td>
-                        <td>{{ doc.uploaded_at.strftime('%d/%m/%Y %H:%M') }}</td>
-                        <td>
-                            {% if doc.reviewed_at %}
-                                {{ doc.reviewed_at.strftime('%d/%m/%Y %H:%M') }}
-                            {% else %}
-                                <span class="text-muted">לא עודכן</span>
-                            {% endif %}
-                        </td>
                         <td>
                             <a href="{{ url_for('uploaded_file', filename=doc.file_path) }}" class="btn btn-outline-primary">
                                 <i class="bi bi-download"></i> הורדה
                             </a>
                         </td>
+                        <td>
+                            {% if doc.comments %}
+                                {{ doc.comments }}
+                            {% else %}
+                                <span class="text-muted">אין הערות</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Lecturers: Add Comments -->
+                        {% if user.role == "Lecturer" and doc.status == "Pending" %}
+                        <td>
+                            <form method="POST" action="{{ url_for('add_comment', document_id=doc.id) }}">
+                                {{ form.hidden_tag() }}
+                                <textarea name="comment" class="form-control" rows="2" required></textarea>
+                                <button type="submit" class="btn btn-outline-info mt-2">שמור הערה</button>
+                            </form>
+                        </td>
+                        {% endif %}
+
+                        <!-- Lecturers and Reviewers: Approve or Reject Documents -->
+                        {% if user.role in ["Lecturer", "Reviewer"] and doc.status == "Pending" %}
+                        <td>
+                            <form method="POST" action="{{ url_for('approve_document', document_id=doc.id) if user.role == 'Lecturer' else url_for('review_approve', document_id=doc.id) }}">
+                                <button type="submit" name="action" value="approve" class="btn btn-outline-success">
+                                    <i class="bi bi-check-circle"></i> אשר
+                                </button>
+                                <button type="submit" name="action" value="reject" class="btn btn-outline-danger">
+                                    <i class="bi bi-x-circle"></i> דחה
+                                </button>
+                            </form>
+                        </td>
+                        {% endif %}
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="5" class="text-center text-muted">אין מסמכים להצגה</td>
+                        <td colspan="6" class="text-center text-muted">אין מסמכים להצגה</td>
                     </tr>
                     {% endfor %}
                 </tbody>

@@ -72,17 +72,18 @@ def logout():
 @app.route("/dashboard")
 @login_required
 def dashboard():
-    # Fetch documents uploaded by the logged-in student
+    form = CommentForm()  # Create an instance of the form
+
     if current_user.role == "Student":
         documents = Document.query.filter_by(student_id=current_user.id).all()
     elif current_user.role == "Lecturer":
         documents = Document.query.filter_by(status="Pending").all()
     elif current_user.role == "Reviewer":
-        documents = Document.query.all()
+        documents = Document.query.all()  # Reviewers can see all documents
     else:
         documents = []
 
-    return render_template("dashboard.html", documents=documents, user=current_user)
+    return render_template("dashboard.html", documents=documents, user=current_user, form=form)
 
 
 @app.route("/upload", methods=["GET", "POST"])
@@ -152,6 +153,7 @@ def approve_document(document_id):
     return redirect(url_for("dashboard"))
 
 
+
 @app.route("/update_password", methods=["GET", "POST"])
 @login_required
 def update_password():
@@ -172,19 +174,41 @@ def update_password():
     return render_template("update_password.html", form=form)
 
 
-@app.route("/add_comment/<int:request_id>", methods=["POST"])
+@app.route("/add_comment/<int:document_id>", methods=["POST"])
 @login_required
-def add_comment(request_id):
+def add_comment(document_id):
     if current_user.role != "Lecturer":
         flash("רק מרצים יכולים להוסיף הערות.", "danger")
         return redirect(url_for("dashboard"))
 
-    request_entry = Request.query.get_or_404(request_id)
-    form = CommentForm()
+    document = Document.query.get_or_404(document_id)
+    comment_text = request.form.get("comment")
 
-    if form.validate_on_submit():
-        request_entry.comments = form.comment.data
+    if comment_text:
+        document.comments = comment_text  # Save comment in the database
         db.session.commit()
         flash("ההערה נוספה בהצלחה!", "success")
+    else:
+        flash("לא ניתן להוסיף הערה ריקה.", "warning")
 
+    return redirect(url_for("dashboard"))
+
+
+@app.route("/review_approve/<int:document_id>", methods=["POST"])
+@login_required
+def review_approve(document_id):
+    if current_user.role != "Reviewer":
+        flash("רק בקרים יכולים לאשר או לדחות מסמכים.", "danger")
+        return redirect(url_for("dashboard"))
+
+    document = Document.query.get_or_404(document_id)
+    action = request.form.get("action")
+
+    if action == "approve":
+        document.status = "Approved"
+    elif action == "reject":
+        document.status = "Rejected"
+
+    db.session.commit()
+    flash("סטטוס המסמך עודכן בהצלחה!", "success")
     return redirect(url_for("dashboard"))
