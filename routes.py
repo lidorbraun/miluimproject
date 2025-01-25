@@ -2,8 +2,8 @@ from flask import render_template, redirect, url_for, flash, request, send_from_
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import User, db, Document, Request, Message
-from forms import RegistrationForm, LoginForm, UploadForm, UpdatePasswordForm, CommentForm, MessageForm
+from models import User, db, Document, Request, Message, WebReview
+from forms import RegistrationForm, LoginForm, UploadForm, UpdatePasswordForm, CommentForm, MessageForm, ReviewForm
 from app import app
 import os
 import matplotlib.pyplot as plt
@@ -331,3 +331,37 @@ def request_history():
 @login_required
 def profile():
     return render_template("profile.html", user=current_user)
+
+
+@app.route("/leave_review", methods=["GET", "POST"])
+@login_required
+def leave_review():
+    if current_user.role != "Student":
+        flash("רק סטודנטים יכולים להשאיר ביקורות.", "danger")
+        return redirect(url_for("dashboard"))
+
+    form = ReviewForm()
+
+    if form.validate_on_submit():
+        new_review = WebReview(
+            student_id=current_user.id,
+            rating=form.rating.data,
+            comment=form.comment.data
+        )
+        db.session.add(new_review)
+        db.session.commit()
+        flash("הביקורת שלך נשלחה בהצלחה!", "success")
+        return redirect(url_for("dashboard"))
+
+    return render_template("leave_review.html", form=form)
+
+@app.route("/view_reviews")
+@login_required
+def view_reviews():
+    if current_user.role not in ["Lecturer", "Reviewer"]:
+        flash("רק מרצים וסוקרים יכולים לצפות בביקורות.", "danger")
+        return redirect(url_for("dashboard"))
+
+    reviews = WebReview.query.all()
+    return render_template("view_reviews.html", reviews=reviews)
+

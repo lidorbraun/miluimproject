@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %} צפייה בביקורות {% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">צפייה בביקורות</h2>
+    <div class="card p-4 shadow-lg">
+        <table class="table table-hover text-center">
+            <thead class="table-dark">
+                <tr>
+                    <th>שם הסטודנט</th>
+                    <th>דירוג</th>
+                    <th>הערה</th>
+                    <th>תאריך</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for review in reviews %}
+                <tr>
+                    <td>{{ review.student.username }}</td>
+                    <td>
+                        {% for _ in range(review.rating) %}
+                            ⭐
+                        {% endfor %}
+                    </td>
+                    <td>{{ review.comment }}</td>
+                    <td>{{ review.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted">אין ביקורות להצגה</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

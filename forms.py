@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, SelectField, TextAreaField
-from wtforms.validators import DataRequired, Email, EqualTo, Length
+from wtforms import StringField, PasswordField, SubmitField, SelectField, TextAreaField, IntegerField, TextAreaField
+from wtforms.validators import DataRequired, Email, EqualTo, Length, NumberRange
+
 
 class RegistrationForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired(), Length(min=3, max=100)])
@@ -42,3 +43,9 @@ class MessageForm(FlaskForm):
     subject = StringField("נושא", validators=[DataRequired()])
     message = TextAreaField("הודעה", validators=[DataRequired()])
     submit = SubmitField("שלח הודעה")
+
+
+class ReviewForm(FlaskForm):
+    rating = IntegerField("דירוג (1-5)", validators=[DataRequired(), NumberRange(min=1, max=5)])
+    comment = TextAreaField("הערה", validators=[DataRequired()])
+    submit = SubmitField("שלח ביקורת")

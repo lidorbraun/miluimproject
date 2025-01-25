@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %} השאר ביקורת {% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">השאר ביקורת</h2>
+    <div class="card p-4 shadow-lg">
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            
+            <div class="mb-3">
+                {{ form.rating.label(class="form-label") }}
+                {{ form.rating(class="form-control") }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.comment.label(class="form-label") }}
+                {{ form.comment(class="form-control", rows=3) }}
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">שלח ביקורת</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

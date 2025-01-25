@@ -64,3 +64,13 @@ class Message(db.Model):
     sender = db.relationship("User", foreign_keys=[sender_id])
     receiver = db.relationship("User", foreign_keys=[receiver_id])
 
+
+class WebReview(db.Model):
+    __tablename__ = 'web_reviews'
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
+    rating = db.Column(db.Integer, nullable=False)
+    comment = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    student = db.relationship('User', backref='web_reviews', lazy=True)
