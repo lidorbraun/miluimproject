@@ -325,3 +325,9 @@ def request_history():
         Document.uploaded_at.desc()).all()
 
     return render_template("request_history.html", documents=reviewed_documents)
+
+
+@app.route("/profile")
+@login_required
+def profile():
+    return render_template("profile.html", user=current_user)

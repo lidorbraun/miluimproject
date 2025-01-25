@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %} פרופיל {% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">הפרופיל שלי</h2>
+    <div class="card shadow-lg p-4">
+        <p><strong>שם משתמש:</strong> {{ user.username }}</p>
+        <p><strong>אימייל:</strong> {{ user.email }}</p>
+        <p><strong>תפקיד:</strong> {{ user.role }}</p>
+    </div>
+    <div class="text-center mt-3">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">חזור ללוח הבקרה</a>
+    </div>
+</div>
+{% endblock %}
