@@ -3,7 +3,6 @@ from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 
-
 class RegistrationForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired(), Length(min=3, max=100)])
     email = StringField("Email", validators=[DataRequired(), Email()])
@@ -37,3 +36,9 @@ class CommentForm(FlaskForm):
     comment = TextAreaField("הוסף הערה", validators=[DataRequired(), Length(max=500)])
     submit = SubmitField("שמור הערה")
 
+
+class MessageForm(FlaskForm):
+    receiver = StringField("נמען", validators=[DataRequired()])
+    subject = StringField("נושא", validators=[DataRequired()])
+    message = TextAreaField("הודעה", validators=[DataRequired()])
+    submit = SubmitField("שלח הודעה")

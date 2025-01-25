@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %} שלח הודעה {% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card p-4 shadow-lg" style="width: 400px;">
+        <h3 class="text-center">שלח הודעה</h3>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            <div class="mb-3">
+                {{ form.receiver.label(class="form-label") }}
+                {{ form.receiver(class="form-control") }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.subject.label(class="form-label") }}
+                {{ form.subject(class="form-control") }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.message.label(class="form-label") }}
+                {{ form.message(class="form-control", rows=3) }}
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">שלח</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

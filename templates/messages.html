@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %} הודעות {% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">הודעות</h2>
+    <div class="text-center mt-3">
+        <a href="{{ url_for('send_message') }}" class="btn btn-primary">שלח הודעה חדשה</a>
+    </div>
+
+    <div class="card mt-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5>הודעות נכנסות</h5>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>מאת</th>
+                        <th>נושא</th>
+                        <th>תאריך</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for msg in received_messages %}
+                    <tr>
+                        <td>{{ msg.sender.username }}</td>
+                        <td>{{ msg.subject }}</td>
+                        <td>{{ msg.sent_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="3" class="text-center text-muted">אין הודעות נכנסות</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card mt-4 shadow-sm">
+        <div class="card-header bg-secondary text-white">
+            <h5>הודעות שנשלחו</h5>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>אל</th>
+                        <th>נושא</th>
+                        <th>תאריך</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for msg in sent_messages %}
+                    <tr>
+                        <td>{{ msg.receiver.username }}</td>
+                        <td>{{ msg.subject }}</td>
+                        <td>{{ msg.sent_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="3" class="text-center text-muted">אין הודעות שנשלחו</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

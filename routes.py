@@ -2,8 +2,8 @@ from flask import render_template, redirect, url_for, flash, request, send_from_
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import User, db, Document, Request
-from forms import RegistrationForm, LoginForm, UploadForm, UpdatePasswordForm, CommentForm
+from models import User, db, Document, Request, Message
+from forms import RegistrationForm, LoginForm, UploadForm, UpdatePasswordForm, CommentForm, MessageForm
 from app import app
 import os
 
@@ -153,7 +153,6 @@ def approve_document(document_id):
     return redirect(url_for("dashboard"))
 
 
-
 @app.route("/update_password", methods=["GET", "POST"])
 @login_required
 def update_password():
@@ -212,3 +211,41 @@ def review_approve(document_id):
     db.session.commit()
     flash("סטטוס המסמך עודכן בהצלחה!", "success")
     return redirect(url_for("dashboard"))
+
+
+@app.route("/messages", methods=["GET"])
+@login_required
+def messages():
+    received_messages = Message.query.filter_by(receiver_id=current_user.id).order_by(Message.sent_at.desc()).all()
+    sent_messages = Message.query.filter_by(sender_id=current_user.id).order_by(Message.sent_at.desc()).all()
+    return render_template("messages.html", received_messages=received_messages, sent_messages=sent_messages)
+
+
+@app.route("/send_message", methods=["GET", "POST"])
+@login_required
+def send_message():
+    form = MessageForm()
+
+    if form.validate_on_submit():
+        recipient = User.query.filter_by(username=form.receiver.data).first()
+        if not recipient:
+            flash("המשתמש לא נמצא.", "danger")
+            return redirect(url_for("send_message"))
+
+        message = Message(
+            sender_id=current_user.id,
+            receiver_id=recipient.id,
+            subject=form.subject.data,
+            message=form.message.data
+        )
+
+        db.session.add(message)
+        db.session.commit()
+        flash("ההודעה נשלחה בהצלחה!", "success")
+        return redirect(url_for("messages"))
+
+    return render_template("send_message.html", form=form)
+
+
+
+

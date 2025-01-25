@@ -48,3 +48,19 @@ class Request(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+
+
+
+class Message(db.Model):
+    __tablename__ = 'messages'
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
+    subject = db.Column(db.String(255), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    sent_at = db.Column(db.DateTime, default=datetime.utcnow)
+    read = db.Column(db.Boolean, default=False)
+
+    sender = db.relationship("User", foreign_keys=[sender_id])
+    receiver = db.relationship("User", foreign_keys=[receiver_id])
+
