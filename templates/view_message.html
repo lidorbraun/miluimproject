@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %} הודעה {% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h5>{{ message.subject }}</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>מאת:</strong> {{ message.sender.username }}</p>
+            <p><strong>תאריך:</strong> {{ message.sent_at.strftime('%d/%m/%Y %H:%M') }}</p>
+            <hr>
+            <p>{{ message.message }}</p>
+        </div>
+        <div class="card-footer">
+            <a href="{{ url_for('messages') }}" class="btn btn-secondary">חזור להודעות</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

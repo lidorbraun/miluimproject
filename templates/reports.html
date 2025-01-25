@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %} דוחות {% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">דוחות בקשות מסמכים</h2>
+
+    <div class="text-center mt-4">
+        <img src="data:image/png;base64,{{ graph_url }}" alt="דוח בקשות לאורך זמן" class="img-fluid">
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">חזור ללוח הבקרה</a>
+    </div>
+</div>
+{% endblock %}

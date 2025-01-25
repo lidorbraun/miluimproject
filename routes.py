@@ -6,6 +6,12 @@ from models import User, db, Document, Request, Message
 from forms import RegistrationForm, LoginForm, UploadForm, UpdatePasswordForm, CommentForm, MessageForm
 from app import app
 import os
+import matplotlib.pyplot as plt
+import io
+import base64
+from datetime import datetime
+from collections import defaultdict
+import matplotlib
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -247,5 +253,75 @@ def send_message():
     return render_template("send_message.html", form=form)
 
 
+@app.route("/message/<int:message_id>")
+@login_required
+def view_message(message_id):
+    message = Message.query.get_or_404(message_id)
+
+    # Ensure the logged-in user is the recipient of the message
+    if message.receiver_id != current_user.id:
+        flash("אין לך גישה להודעה זו.", "danger")
+        return redirect(url_for("messages"))
+
+    # Mark the message as read
+    message.read = True
+    db.session.commit()
+
+    return render_template("view_message.html", message=message)
 
 
+@app.route("/reports")
+@login_required
+def reports():
+    if current_user.role != "Reviewer":
+        flash("Only reviewers can access reports.", "danger")
+        return redirect(url_for("dashboard"))
+
+    # Get all approved and rejected requests
+    approved_requests = Document.query.filter_by(status="Approved").all()
+    rejected_requests = Document.query.filter_by(status="Rejected").all()
+
+    # Process data for graph
+    def count_requests_by_date(requests):
+        data = defaultdict(int)
+        for req in requests:
+            date_key = req.uploaded_at.strftime("%Y-%m-%d")
+            data[date_key] += 1
+        return dict(sorted(data.items()))  # Sort by date
+
+    approved_data = count_requests_by_date(approved_requests)
+    rejected_data = count_requests_by_date(rejected_requests)
+
+    # Create graph with English labels
+    plt.figure(figsize=(10, 5))
+    plt.plot(approved_data.keys(), approved_data.values(), marker="o", linestyle="-", label="Approved", color="green")
+    plt.plot(rejected_data.keys(), rejected_data.values(), marker="o", linestyle="-", label="Rejected", color="red")
+
+    plt.xlabel("Date", fontsize=12)
+    plt.ylabel("Number of Requests", fontsize=12)
+    plt.title("Requests Over Time", fontsize=14)
+    plt.legend()
+    plt.xticks(rotation=45, ha="right")
+
+    # Save graph to memory and convert to base64
+    img = io.BytesIO()
+    plt.savefig(img, format="png", bbox_inches="tight", dpi=100)
+    img.seek(0)
+    graph_url = base64.b64encode(img.getvalue()).decode()
+    img.close()
+
+    return render_template("reports.html", graph_url=graph_url)
+
+
+@app.route("/request_history")
+@login_required
+def request_history():
+    if current_user.role != "Lecturer":
+        flash("Only lecturers can access request history.", "danger")
+        return redirect(url_for("dashboard"))
+
+    # Fetch all documents that have been reviewed
+    reviewed_documents = Document.query.filter(Document.status.in_(["Approved", "Rejected"])).order_by(
+        Document.uploaded_at.desc()).all()
+
+    return render_template("request_history.html", documents=reviewed_documents)
