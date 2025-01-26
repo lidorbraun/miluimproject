@@ -9,13 +9,7 @@
         <h4 class="text-muted">תפקיד: {{ user.role }}</h4>
     </div>
 
-    {% if user.role == "Student" %}
-        <div class="d-flex justify-content-center mt-3">
-            <a href="{{ url_for('upload_document') }}" class="btn btn-success">
-                <i class="bi bi-upload"></i> העלה מסמך חדש
-            </a>
-        </div>
-    {% endif %}
+
 
     <div class="card mt-4 shadow-sm">
         <div class="card-header bg-primary text-white text-center">
