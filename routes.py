@@ -364,4 +364,3 @@ def view_reviews():
 
     reviews = WebReview.query.all()
     return render_template("view_reviews.html", reviews=reviews)
-
